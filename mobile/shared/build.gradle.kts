@@ -27,8 +27,13 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.materialIconsExtended)
+            implementation(compose.animation)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
+            // Explicit, not transitive: `implementation` hides a dependency's own
+            // dependencies from the compile classpath, so Dispatchers/withContext in
+            // androidMain would not resolve through compose.runtime.
+            implementation(libs.kotlinx.coroutines.core)
             implementation(libs.multiplatform.settings)
         }
     }
