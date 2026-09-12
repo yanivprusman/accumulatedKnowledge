@@ -1,5 +1,10 @@
 package com.automatelinux.localKnowledge.ui.components
 
+import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,6 +69,40 @@ fun DistanceLabel(metres: Double?, bearing: Double?, modifier: Modifier = Modifi
     )
 }
 
+/**
+ * The app's own chip.
+ *
+ * Hand-rolled rather than Material's FilterChip: a selected FilterChip paints
+ * itself from `secondaryContainer`, so on a green app it comes out lavender the
+ * moment you tap it. This one carries the app's colour in both states.
+ */
+@Composable
+fun KnowledgeChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    val bg by animateColorAsState(
+        if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
+        label = "chipBg",
+    )
+    Box(
+        Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(bg)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = if (selected) 0f else 0.55f),
+                shape = RoundedCornerShape(20.dp),
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (selected) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
 /** The needs actually on record, as a filter. "הכל" clears it. */
 @Composable
 fun NeedFilterRow(
@@ -80,19 +117,9 @@ fun NeedFilterRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item {
-            FilterChip(
-                selected = selected == null,
-                onClick = { onSelect(null) },
-                label = { Text("הכל") },
-            )
-        }
+        item { KnowledgeChip("הכל", selected == null) { onSelect(null) } }
         items(needs) { need ->
-            FilterChip(
-                selected = selected == need,
-                onClick = { onSelect(if (selected == need) null else need) },
-                label = { Text(need) },
-            )
+            KnowledgeChip(need, selected == need) { onSelect(if (selected == need) null else need) }
         }
     }
 }

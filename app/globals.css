@@ -1,2 +1,33 @@
 @import "tailwindcss";
 @source "../lib/feedback-lib";
+
+/* A field notebook: warm paper and ink, and a real dark ground for reading at
+   night — which is when half of what this app records actually happens. */
+@theme {
+  --color-paper: #f7f3ea;
+  --color-ink: #241f1a;
+  --color-card: #fffdf8;
+  --color-rule: #bfb5a2;
+  --color-pine: #2f5d4a;
+  --color-works: #2f6b4f;
+  --color-avoid: #a8541e;
+  --color-muted: #57503f;
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-paper: #15140f;
+    --color-ink: #ede7da;
+    --color-card: #1e1c16;
+    --color-rule: #6b6455;
+    --color-pine: #8fc3ac;
+    --color-works: #7fc49e;
+    --color-avoid: #e8a06a;
+    --color-muted: #cac2b2;
+  }
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}

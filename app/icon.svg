@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <!-- Same mark as the launcher: a written note that comes to a point. -->
+  <rect width="108" height="108" rx="24" fill="#2F5D4A"/>
+  <path d="M39,27 H69 a5,5 0 0 1 5,5 V57 L54,85 L34,57 V32 a5,5 0 0 1 5,-5 Z" fill="#F4EEE1"/>
+  <rect x="42" y="37" width="24" height="4.2" rx="2.1" fill="#2F5D4A"/>
+  <rect x="42" y="46.5" width="16" height="4.2" rx="2.1" fill="#2F5D4A"/>
+</svg>

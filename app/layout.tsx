@@ -3,13 +3,13 @@ import "./globals.css";
 import { FeedbackChat } from '@automate/feedback-lib/FeedbackChat';
 
 export const metadata: Metadata = {
-  title: "localKnowledge",
-  description: "Personal index of what works where — findings anchored to places, recalled nearest-first",
+  title: "ידע מקומי",
+  description: "מה עובד, איפה — מה שלמדת בשטח ושום מפה לא יודעת",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en">
+    <html lang="he" dir="rtl">
       <body>{children}
         <FeedbackChat issuesPath="/feedback-lib-issues" />
 </body>

@@ -36,6 +36,13 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.multiplatform.settings)
         }
+        // The two things here that cannot be checked by looking at the screen: how
+        // old a finding reads as, and the order the list comes out in. Both are
+        // wrong silently — an app that mislabels a four-year-old note as recent
+        // looks exactly like one that does not.
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 }
 

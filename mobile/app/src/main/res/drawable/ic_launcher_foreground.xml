@@ -1,5 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A written note that comes to a point: the card is the page, the point is the pin.
+
+  That is the whole app in one silhouette — knowledge (the ruled lines) fixed to a
+  place (the point). It is deliberately NOT the teardrop every map app uses: what
+  this holds is the sentence, not the coordinate.
+
+  Everything sits inside the 66dp safe circle (centre 54,54) so no launcher mask
+  clips the point off.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#FFFFFF" android:pathData="M38,38 h32 a6,6 0 0 1 6,6 v20 a6,6 0 0 1 -6,6 h-32 a6,6 0 0 1 -6,-6 v-20 a6,6 0 0 1 6,-6 z" />
-    <path android:fillColor="#B2DFDB" android:pathData="M46,48 h16 v4 h-16 z M46,56 h16 v4 h-16 z" />
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- The page, tapering to the pin point. -->
+    <path
+        android:fillColor="#F4EEE1"
+        android:pathData="M39,27 L69,27 A5,5 0 0 1 74,32 L74,57 L54,85 L34,57 L34,32 A5,5 0 0 1 39,27 Z" />
+
+    <!-- Two rules knocked out in the field colour: a line and a half, which reads
+         as writing rather than as a form. -->
+    <path
+        android:fillColor="#2F5D4A"
+        android:pathData="M42,37 L66,37 A2.1,2.1 0 0 1 66,41.2 L42,41.2 A2.1,2.1 0 0 1 42,37 Z" />
+    <path
+        android:fillColor="#2F5D4A"
+        android:pathData="M42,46.5 L58,46.5 A2.1,2.1 0 0 1 58,50.7 L42,50.7 A2.1,2.1 0 0 1 42,46.5 Z" />
 </vector>

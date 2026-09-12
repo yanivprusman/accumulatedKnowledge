@@ -1,5 +1,13 @@
 package com.automatelinux.localKnowledge.ui
 
+import com.automatelinux.localKnowledge.ui.theme.VerdictColors
+import com.automatelinux.localKnowledge.data.Verdict
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +46,7 @@ import com.automatelinux.localKnowledge.ui.components.DistanceLabel
 import com.automatelinux.localKnowledge.ui.components.PendingBadge
 import com.automatelinux.localKnowledge.ui.components.VerdictBadge
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     located: Located,
@@ -73,11 +82,29 @@ fun DetailScreen(
                 .padding(horizontal = 20.dp),
         ) {
             Spacer(Modifier.height(4.dp))
+            // The verdict as a rule under the title: colour first, word second.
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(f.place, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+                Text(
+                    f.place,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f),
+                )
                 if (located.pending) PendingBadge() else VerdictBadge(f.verdict)
             }
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(10.dp))
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(3.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(
+                        if (located.pending) MaterialTheme.colorScheme.secondary
+                        else if (f.verdict == Verdict.WORKS) VerdictColors.works
+                        else VerdictColors.avoid,
+                    ),
+            )
+            Spacer(Modifier.height(10.dp))
             DistanceLabel(located.metres, located.bearing)
 
             Spacer(Modifier.height(20.dp))
