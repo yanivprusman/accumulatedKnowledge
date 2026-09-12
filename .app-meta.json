@@ -1,0 +1,7 @@
+{
+  "description": "Personal index of what works where — findings anchored to places, recalled nearest-first",
+  "icon": "Smartphone",
+  "sharedLibs": [
+    "android-feedback-lib"
+  ]
+}
