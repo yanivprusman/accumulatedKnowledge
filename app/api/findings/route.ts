@@ -18,19 +18,32 @@ export const POST = guarded(async (request) => {
   );
   if (missing.length)
     return Response.json({ ok: false, error: `missing: ${missing.join(", ")}` }, { status: 400 });
-  if (typeof body.lat !== "number" || typeof body.lon !== "number")
-    return Response.json({ ok: false, error: "lat and lon must be numbers" }, { status: 400 });
+
+  // A position is both halves or neither. Neither is a finding with no spot — a
+  // supplier you phone — never half a coordinate that would navigate somewhere wrong.
+  const located = typeof body.lat === "number" && typeof body.lon === "number";
+  const unlocated = body.lat == null && body.lon == null;
+  if (!located && !unlocated)
+    return Response.json(
+      { ok: false, error: "lat and lon must both be numbers, or both be absent" },
+      { status: 400 },
+    );
+
+  const phone = typeof body.phone === "string" && body.phone.trim() ? body.phone.trim() : null;
+  if (phone && phone.length > 32)
+    return Response.json({ ok: false, error: "phone is longer than 32 characters" }, { status: 400 });
 
   const now = new Date().toISOString().slice(0, 19).replace("T", " ");
   await saveFinding({
     id: body.id!,
     need: body.need!.trim(),
     place: body.place!.trim(),
-    lat: body.lat,
-    lon: body.lon,
-    accuracyM: typeof body.accuracyM === "number" ? Math.round(body.accuracyM) : null,
+    lat: located ? body.lat! : null,
+    lon: located ? body.lon! : null,
+    accuracyM: located && typeof body.accuracyM === "number" ? Math.round(body.accuracyM) : null,
     verdict: body.verdict === "AVOID" ? "AVOID" : "WORKS",
     method: body.method!,
+    phone,
     foundAt: body.foundAt ?? now,
     confirmedAt: body.confirmedAt ?? body.foundAt ?? now,
     confirmedN: typeof body.confirmedN === "number" ? body.confirmedN : 1,

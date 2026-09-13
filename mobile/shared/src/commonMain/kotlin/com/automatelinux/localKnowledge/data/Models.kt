@@ -19,22 +19,32 @@ enum class Verdict { WORKS, AVOID }
  * `need` is what you were after; `method` is what actually works. The split
  * matters: you search by the need you have again, and what you read back is the
  * method, because the place alone is what every map already told you.
+ *
+ * `lat`/`lon` are both set or both null. Null is a finding with no spot — a
+ * supplier you phone, whose number you wrote down wherever you happened to be
+ * standing. Anchoring it there would navigate you to the wrong place.
  */
 @Serializable
 data class Finding(
     val id: String,
     val need: String,
     val place: String,
-    val lat: Double,
-    val lon: Double,
+    val lat: Double? = null,
+    val lon: Double? = null,
     @SerialName("accuracyM") val accuracyM: Int? = null,
     val verdict: Verdict = Verdict.WORKS,
     val method: String,
+    /** Someone to call about it. Null for most findings — a shower has no number. */
+    val phone: String? = null,
     val foundAt: String,
     val confirmedAt: String,
     val confirmedN: Int = 1,
     val updatedAt: String = "",
 )
+
+/** Where to drive to, or null for a finding that is a person rather than a place. */
+val Finding.spot: LatLon?
+    get() = if (lat != null && lon != null) LatLon(lat, lon) else null
 
 /**
  * Needs seen often enough to be worth one tap.

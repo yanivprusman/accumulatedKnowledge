@@ -64,12 +64,15 @@ class KnowledgeStore(
      *  rows that need the user to do something about them. */
     fun located(fix: Fix?, need: String?): List<Located> {
         val here = fix?.let { LatLon(it.lat, it.lon) }
-        fun decorate(f: Finding, pending: Boolean) = Located(
-            finding = f,
-            metres = here?.let { distanceMetres(it, LatLon(f.lat, f.lon)) },
-            bearing = here?.let { bearingDegrees(it, LatLon(f.lat, f.lon)) },
-            pending = pending,
-        )
+        fun decorate(f: Finding, pending: Boolean): Located {
+            val spot = f.spot
+            return Located(
+                finding = f,
+                metres = if (here != null && spot != null) distanceMetres(here, spot) else null,
+                bearing = if (here != null && spot != null) bearingDegrees(here, spot) else null,
+                pending = pending,
+            )
+        }
 
         val matches = { f: Finding -> need == null || f.need == need }
         val pending = _outbox.value.filter(matches).map { decorate(it, true) }
@@ -77,10 +80,14 @@ class KnowledgeStore(
 
         // With no fix there is no nearest, and pretending otherwise would order the
         // list by something the user cannot see. Most-recently-confirmed instead,
-        // and the screen says which ordering it is using.
+        // and the screen says which ordering it is using. A finding with no spot —
+        // someone you phone — has no nearest either, so those follow the located ones.
         val ordered =
             if (here == null) saved.sortedByDescending { it.finding.confirmedAt }
-            else saved.sortedBy { it.metres ?: Double.MAX_VALUE }
+            else saved.sortedWith(
+                compareBy<Located> { it.metres ?: Double.MAX_VALUE }
+                    .thenByDescending { it.finding.confirmedAt },
+            )
         return pending + ordered
     }
 

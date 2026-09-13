@@ -1,5 +1,6 @@
 import { listFindings, type Finding } from "@/lib/findings";
 import { ageLabel } from "@/lib/age";
+import { whatsAppDigits } from "@/lib/phone";
 
 // Read from the database on every request: this page is for reading back what you
 // know before a trip, and a cached copy of that is worse than useless.
@@ -72,8 +73,11 @@ export default async function Home() {
   );
 }
 
+const linkClass = "font-medium text-(--color-pine) underline-offset-2 hover:underline";
+
 function FindingCard({ finding: f }: { finding: Finding }) {
   const works = f.verdict === "WORKS";
+  const wa = f.phone ? whatsAppDigits(f.phone) : null;
   return (
     <article className="rounded-xl border border-(--color-rule)/40 bg-(--color-card) p-5">
       <div className="flex items-start justify-between gap-3">
@@ -99,17 +103,40 @@ function FindingCard({ finding: f }: { finding: Finding }) {
           אושר {ageLabel(f.confirmedAt)}
           {f.confirmedN > 1 && ` · ${f.confirmedN} פעמים`}
         </span>
-        <a
-          // waze.com/ul is Waze's own deep link, and it is an Android App Link —
-          // tapping it on a phone opens Waze already navigating.
-          href={`https://waze.com/ul?ll=${f.lat}%2C${f.lon}&navigate=yes`}
-          target="_blank"
-          rel="noreferrer"
-          data-id={`waze-${f.id}`}
-          className="font-medium text-(--color-pine) underline-offset-2 hover:underline"
-        >
-          נווט ב-Waze
-        </a>
+        {f.phone && (
+          <a
+            href={`tel:${f.phone.replace(/[^\d+]/g, "")}`}
+            dir="ltr"
+            data-id={`call-${f.id}`}
+            className={linkClass}
+          >
+            {f.phone}
+          </a>
+        )}
+        {wa && (
+          <a
+            href={`https://wa.me/${wa}`}
+            target="_blank"
+            rel="noreferrer"
+            data-id={`whatsapp-${f.id}`}
+            className={linkClass}
+          >
+            וואטסאפ
+          </a>
+        )}
+        {f.lat !== null && f.lon !== null && (
+          <a
+            // waze.com/ul is Waze's own deep link, and it is an Android App Link —
+            // tapping it on a phone opens Waze already navigating.
+            href={`https://waze.com/ul?ll=${f.lat}%2C${f.lon}&navigate=yes`}
+            target="_blank"
+            rel="noreferrer"
+            data-id={`waze-${f.id}`}
+            className={linkClass}
+          >
+            נווט ב-Waze
+          </a>
+        )}
       </div>
     </article>
   );

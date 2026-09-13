@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.automatelinux.localKnowledge.data.Located
 import com.automatelinux.localKnowledge.data.ageLabel
+import com.automatelinux.localKnowledge.data.spot
 import com.automatelinux.localKnowledge.ui.components.DistanceLabel
 import com.automatelinux.localKnowledge.ui.components.PendingBadge
 import com.automatelinux.localKnowledge.ui.components.VerdictBadge
@@ -55,8 +56,11 @@ fun DetailScreen(
     onConfirm: () -> Unit,
     onDelete: () -> Unit,
     onNavigate: () -> Unit,
+    onCall: () -> Unit,
+    onWhatsApp: () -> Unit,
 ) {
     val f = located.finding
+    val hasSpot = f.spot != null
     var confirmingDelete by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -124,19 +128,34 @@ fun DetailScreen(
             )
 
             Spacer(Modifier.height(24.dp))
-            Button(
-                onClick = onNavigate,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-            ) { Text("נווט לשם") }
+            f.phone?.let { phone ->
+                // The number as text too, so it can be read out to someone or copied.
+                Text(phone, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(8.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Button(onClick = onCall, modifier = Modifier.weight(1f).height(52.dp)) { Text("התקשר") }
+                    OutlinedButton(onClick = onWhatsApp, modifier = Modifier.weight(1f).height(52.dp)) {
+                        Text("וואטסאפ")
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+            }
 
-            Spacer(Modifier.height(10.dp))
+            if (hasSpot) {
+                Button(
+                    onClick = onNavigate,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                ) { Text("נווט לשם") }
+                Spacer(Modifier.height(10.dp))
+            }
+
             // Confirming is how a note becomes knowledge — it is the only thing that
             // tells a reader two years from now whether this is still true.
             OutlinedButton(
                 onClick = onConfirm,
                 enabled = !located.pending,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-            ) { Text("הייתי כאן — עדיין נכון") }
+            ) { Text(if (hasSpot) "הייתי כאן — עדיין נכון" else "עדיין נכון") }
 
             Spacer(Modifier.height(32.dp))
         }

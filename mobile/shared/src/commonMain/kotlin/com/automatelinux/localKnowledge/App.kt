@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import com.automatelinux.localKnowledge.data.KnowledgeStore
 import com.automatelinux.localKnowledge.data.LocationProvider
 import com.automatelinux.localKnowledge.data.PlatformActions
+import com.automatelinux.localKnowledge.data.spot
 import com.automatelinux.localKnowledge.ui.CaptureScreen
 import com.automatelinux.localKnowledge.ui.DetailScreen
 import com.automatelinux.localKnowledge.ui.HomeScreen
@@ -29,7 +30,8 @@ import com.automatelinux.localKnowledge.ui.theme.AppTheme
  * The whole app, shared between Android and (on a Mac) iOS.
  *
  * The platform supplies three things — storage, where the phone is, and how to
- * hand a coordinate to a navigator — and everything else is here.
+ * hand a coordinate or a phone number to the app that deals with it — and
+ * everything else is here.
  */
 @Composable
 fun App(
@@ -85,19 +87,18 @@ fun App(
                             if (located == null) {
                                 LaunchedEffect(route.findingId) { navigator.back() }
                             } else {
+                                val finding = located.finding
                                 DetailScreen(
                                     located = located,
                                     onBack = { navigator.back() },
-                                    onEdit = { navigator.go(Route.Capture(located.finding.id)) },
-                                    onConfirm = { store.confirm(located.finding.id) },
-                                    onDelete = { store.delete(located.finding.id); navigator.back() },
+                                    onEdit = { navigator.go(Route.Capture(finding.id)) },
+                                    onConfirm = { store.confirm(finding.id) },
+                                    onDelete = { store.delete(finding.id); navigator.back() },
                                     onNavigate = {
-                                        actions.navigateTo(
-                                            located.finding.lat,
-                                            located.finding.lon,
-                                            located.finding.place,
-                                        )
+                                        finding.spot?.let { actions.navigateTo(it.lat, it.lon, finding.place) }
                                     },
+                                    onCall = { finding.phone?.let(actions::call) },
+                                    onWhatsApp = { finding.phone?.let(actions::openWhatsApp) },
                                 )
                             }
                         }

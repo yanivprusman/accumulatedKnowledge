@@ -6,11 +6,13 @@ export type Finding = {
   id: string;
   need: string;
   place: string;
-  lat: number;
-  lon: number;
+  /** Both set or both null. Null is a finding with no spot — a supplier you phone. */
+  lat: number | null;
+  lon: number | null;
   accuracyM: number | null;
   verdict: "WORKS" | "AVOID";
   method: string;
+  phone: string | null;
   foundAt: string;
   confirmedAt: string;
   confirmedN: number;
@@ -18,8 +20,8 @@ export type Finding = {
 };
 
 type Row = {
-  id: string; need: string; place: string; lat: number; lon: number;
-  accuracy_m: number | null; verdict: "WORKS" | "AVOID"; method: string;
+  id: string; need: string; place: string; lat: number | null; lon: number | null;
+  accuracy_m: number | null; verdict: "WORKS" | "AVOID"; method: string; phone: string | null;
   found_at: string; confirmed_at: string; confirmed_n: number; updated_at: string;
 };
 
@@ -27,11 +29,12 @@ const toFinding = (r: Row): Finding => ({
   id: r.id,
   need: r.need,
   place: r.place,
-  lat: Number(r.lat),
-  lon: Number(r.lon),
+  lat: r.lat === null ? null : Number(r.lat),
+  lon: r.lon === null ? null : Number(r.lon),
   accuracyM: r.accuracy_m === null ? null : Number(r.accuracy_m),
   verdict: r.verdict,
   method: r.method,
+  phone: r.phone,
   foundAt: r.found_at,
   confirmedAt: r.confirmed_at,
   confirmedN: Number(r.confirmed_n),
@@ -55,16 +58,16 @@ export async function listFindings(): Promise<Finding[]> {
 export async function saveFinding(f: Finding): Promise<void> {
   await exec(
     `INSERT INTO findings
-       (id, need, place, lat, lon, accuracy_m, verdict, method,
+       (id, need, place, lat, lon, accuracy_m, verdict, method, phone,
         found_at, confirmed_at, confirmed_n, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
      ON DUPLICATE KEY UPDATE
        need=VALUES(need), place=VALUES(place), lat=VALUES(lat), lon=VALUES(lon),
        accuracy_m=VALUES(accuracy_m), verdict=VALUES(verdict), method=VALUES(method),
-       found_at=VALUES(found_at), confirmed_at=VALUES(confirmed_at),
+       phone=VALUES(phone), found_at=VALUES(found_at), confirmed_at=VALUES(confirmed_at),
        confirmed_n=VALUES(confirmed_n), updated_at=VALUES(updated_at)`,
     [
-      f.id, f.need, f.place, f.lat, f.lon, f.accuracyM, f.verdict, f.method,
+      f.id, f.need, f.place, f.lat, f.lon, f.accuracyM, f.verdict, f.method, f.phone,
       f.foundAt, f.confirmedAt, f.confirmedN, f.updatedAt,
     ],
   );

@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -41,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +52,7 @@ import com.automatelinux.localKnowledge.data.Finding
 import com.automatelinux.localKnowledge.data.Fix
 import com.automatelinux.localKnowledge.data.Verdict
 import com.automatelinux.localKnowledge.data.nowUtc
+import com.automatelinux.localKnowledge.data.spot
 import com.automatelinux.localKnowledge.ui.components.KnowledgeChip
 import com.automatelinux.localKnowledge.ui.theme.VerdictColors
 import kotlin.math.roundToInt
@@ -64,7 +68,8 @@ import kotlin.math.roundToInt
  *
  * The position is taken when the screen opens and is then FIXED: it is where you
  * were when you learned the thing, and must not drift because you kept typing on
- * the walk back to the car.
+ * the walk back to the car. "בלי מיקום" drops it for a finding that is a person
+ * rather than a spot — a supplier is not where you stood when you saved his number.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,16 +80,21 @@ fun CaptureScreen(
     onSave: (Finding) -> Unit,
     onBack: () -> Unit,
 ) {
-    val capturedFix = remember { existing?.let { Fix(it.lat, it.lon, it.accuracyM?.toFloat()) } ?: fix }
+    val capturedFix = remember {
+        existing?.spot?.let { Fix(it.lat, it.lon, existing.accuracyM?.toFloat()) } ?: fix
+    }
 
     var need by rememberSaveable { mutableStateOf(existing?.need ?: "") }
     var place by rememberSaveable { mutableStateOf(existing?.place ?: "") }
     var method by rememberSaveable { mutableStateOf(existing?.method ?: "") }
+    var phone by rememberSaveable { mutableStateOf(existing?.phone ?: "") }
     var verdict by rememberSaveable { mutableStateOf(existing?.verdict ?: Verdict.WORKS) }
+    var withoutSpot by rememberSaveable { mutableStateOf(existing != null && existing.spot == null) }
 
     // What he has actually needed before comes first; the stock list fills in behind.
     val suggestions = remember(knownNeeds) { (knownNeeds + COMMON_NEEDS).distinct() }
-    val canSave = need.isNotBlank() && place.isNotBlank() && method.isNotBlank() && capturedFix != null
+    val canSave = need.isNotBlank() && place.isNotBlank() && method.isNotBlank() &&
+        (withoutSpot || capturedFix != null)
 
     Scaffold(
         topBar = {
@@ -152,6 +162,16 @@ fun CaptureScreen(
             )
 
             Spacer(Modifier.height(14.dp))
+            SectionLabel("טלפון", Modifier.padding(horizontal = 20.dp))
+            Field(
+                value = phone,
+                onValueChange = { phone = it },
+                label = "לא חובה — למי שמתקשרים אליו",
+                keyboardType = KeyboardType.Phone,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+            )
+
+            Spacer(Modifier.height(14.dp))
             SectionLabel("מה יצא מזה", Modifier.padding(horizontal = 20.dp))
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
@@ -166,23 +186,31 @@ fun CaptureScreen(
             }
 
             Spacer(Modifier.height(18.dp))
-            PositionNote(capturedFix, Modifier.padding(horizontal = 20.dp))
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                PositionNote(capturedFix, withoutSpot, Modifier.weight(1f))
+                Spacer(Modifier.width(10.dp))
+                KnowledgeChip("בלי מיקום", selected = withoutSpot) { withoutSpot = !withoutSpot }
+            }
 
             Spacer(Modifier.height(16.dp))
             Button(
                 onClick = {
-                    val f = capturedFix ?: return@Button
+                    val f = if (withoutSpot) null else (capturedFix ?: return@Button)
                     val now = nowUtc()
                     onSave(
                         Finding(
                             id = existing?.id ?: newId(),
                             need = need.trim(),
                             place = place.trim(),
-                            lat = f.lat,
-                            lon = f.lon,
-                            accuracyM = f.accuracyM?.roundToInt(),
+                            lat = f?.lat,
+                            lon = f?.lon,
+                            accuracyM = f?.accuracyM?.roundToInt(),
                             verdict = verdict,
                             method = method.trim(),
+                            phone = phone.trim().ifEmpty { null },
                             foundAt = existing?.foundAt ?: now,
                             confirmedAt = existing?.confirmedAt ?: now,
                             confirmedN = existing?.confirmedN ?: 1,
@@ -198,7 +226,7 @@ fun CaptureScreen(
             // Says which field is still empty, rather than leaving a dead button.
             if (!canSave) {
                 Text(
-                    missingLabel(need, place, method, capturedFix),
+                    missingLabel(need, place, method, capturedFix, withoutSpot),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -228,12 +256,14 @@ private fun Field(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Text,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
         singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         shape = RoundedCornerShape(12.dp),
         modifier = modifier.fillMaxWidth(),
     )
@@ -275,20 +305,24 @@ private fun VerdictOption(
 }
 
 @Composable
-private fun PositionNote(fix: Fix?, modifier: Modifier = Modifier) {
+private fun PositionNote(fix: Fix?, withoutSpot: Boolean, modifier: Modifier = Modifier) {
     Text(
-        text = fix?.let {
-            val acc = it.accuracyM?.let { a -> " · דיוק ${a.roundToInt()} מ׳" } ?: ""
-            "נשמר כאן: ${format6(it.lat)}, ${format6(it.lon)}$acc"
-        } ?: "אין עדיין מיקום. רישום בלי מיקום לא יעזור בפעם הבאה — חכה לקליטת GPS.",
+        text = when {
+            withoutSpot -> "נשמר בלי מיקום — לא יופיע לפי קרבה ואין אליו ניווט."
+            fix != null -> {
+                val acc = fix.accuracyM?.let { a -> " · דיוק ${a.roundToInt()} מ׳" } ?: ""
+                "נשמר כאן: ${format6(fix.lat)}, ${format6(fix.lon)}$acc"
+            }
+            else -> "אין עדיין מיקום. רישום בלי מיקום לא יעזור בפעם הבאה — חכה לקליטת GPS."
+        },
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier,
     )
 }
 
-private fun missingLabel(need: String, place: String, method: String, fix: Fix?): String {
-    if (fix == null) return "אין מיקום — חכה לקליטת GPS"
+private fun missingLabel(need: String, place: String, method: String, fix: Fix?, withoutSpot: Boolean): String {
+    if (!withoutSpot && fix == null) return "אין מיקום — חכה לקליטת GPS"
     val missing = buildList {
         if (need.isBlank()) add("מה חיפשת")
         if (method.isBlank()) add("מה עובד")

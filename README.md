@@ -24,7 +24,8 @@ One table, one record type: a **finding**.
 | `need` | what you were after — `מקלחת`, `אוהל`, `חנות`. A string, never an enum: the next need is one you have not had yet. |
 | `method` | the payload. How to actually get the thing. |
 | `place` | what you would call it out loud. |
-| `lat` / `lon` | **where you stop the car**, not where the thing is. The seeded Beit Yanai record points at the gate, because that is what you navigate to. |
+| `lat` / `lon` | **where you stop the car**, not where the thing is. The seeded Beit Yanai record points at the gate, because that is what you navigate to. **Or neither**: a supplier you phone has no spot, and anchoring him to wherever you stood when you saved his number would navigate you there. |
+| `phone` | someone to call about it — tap to dial or open WhatsApp. Null for most findings; a shower has no number. |
 | `verdict` | `WORKS` or `AVOID`. |
 | `confirmed_at` / `confirmed_n` | when it was last checked, and how many times. |
 
@@ -62,7 +63,7 @@ hours into the future. Every timestamp is passed explicitly, in UTC.
 | `app/api/findings/…` | list / save / confirm / delete, all bearer-guarded |
 | `app/page.tsx` | the reading room — everything you know, on a big screen. Read-only on purpose: a finding edited from an armchair is a finding edited without being there. |
 | `mobile/shared/src/commonMain` | **every screen.** Models, geo, store, UI. |
-| `mobile/app` | the Android launcher: location, storage, `geo:` hand-off. iOS is a launcher away. |
+| `mobile/app` | the Android launcher: location, storage, and the hand-offs — `geo:` to a navigator, `tel:` to the dialler, `wa.me` to WhatsApp. iOS is a launcher away. |
 
 ## Auth
 
@@ -91,6 +92,6 @@ Web side: `d startApp --app localKnowledge` (dev 3153, prod 3152).
 
 `./gradlew :shared:testDebugUnitTest` — the two things that cannot be checked by
 looking at the screen: how old a finding reads as, and the geometry the list is
-ordered by. Both fail silently. The bearing test is there because the first draft
+ordered by — including that a finding with no spot sorts after the ones you can drive to — and the phone digits a WhatsApp link needs. All fail silently. The bearing test is there because the first draft
 of the seeded record said the showers were *west* of the gate; they are
 south-west, and "west" is how you walk past them in the dark.

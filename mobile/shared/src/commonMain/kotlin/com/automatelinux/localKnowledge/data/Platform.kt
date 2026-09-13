@@ -25,9 +25,15 @@ interface LocationProvider {
     fun start()
 }
 
-/** Handing a place to whatever the phone actually navigates with. */
+/** Handing a place or a person to whatever the phone actually deals with it in. */
 interface PlatformActions {
     /** A `geo:` URI, so the phone offers Waze or Maps or whatever is installed —
      *  rather than this app deciding for the person holding it. */
     fun navigateTo(lat: Double, lon: Double, label: String)
+
+    /** Opens the dialler with the number filled in. Never places the call itself. */
+    fun call(phone: String)
+
+    /** Opens a WhatsApp chat with the number. */
+    fun openWhatsApp(phone: String)
 }
