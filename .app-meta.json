@@ -1,5 +1,5 @@
 {
-  "description": "Personal index of what works where — findings anchored to places, recalled nearest-first",
+  "description": "Accumulated knowledge — what worked, kept with the place or the person it came from",
   "icon": "Smartphone",
   "sharedLibs": [
     "android-feedback-lib"

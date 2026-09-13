@@ -25,11 +25,11 @@ val apiBaseUrl = envProps.getProperty("API_BASE_URL", "http://10.7.0.2:3153")
 val apiToken = envProps.getProperty("API_TOKEN", "")
 
 android {
-    namespace = "com.automatelinux.localKnowledge"
+    namespace = "com.automatelinux.accumulatedKnowledge"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.automatelinux.localKnowledge"
+        applicationId = "com.automatelinux.accumulatedKnowledge"
         minSdk = 26
         targetSdk = 35
         versionCode = gitCommitCount

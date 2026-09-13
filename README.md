@@ -1,6 +1,6 @@
-# ידע מקומי — localKnowledge
+# ידע מצטבר — accumulatedKnowledge
 
-What works where, written down where you learned it.
+Knowledge that accumulates: what worked, written down where — or from whom — you learned it.
 
 ## Why it exists
 
@@ -39,7 +39,7 @@ from written down once, and the UI says which in words ("אושר לפני 2 י�
 
 ## Where state lives
 
-- **The server is the record** (`local_knowledge` on the system MySQL, 3306). The
+- **The server is the record** (`accumulated_knowledge` on the system MySQL, 3306). The
   device keeps a cache so the app opens useful with no signal; the cache is never
   a second place a finding can be edited.
 - **Capture survives no coverage**, because a tent spot is learned exactly where
@@ -58,7 +58,7 @@ hours into the future. Every timestamp is passed explicitly, in UTC.
 
 | path | what |
 | :--- | :--- |
-| `db/schema.sql` | the one table. Re-runnable: `sudo mysql local_knowledge < db/schema.sql` |
+| `db/schema.sql` | the one table. Re-runnable: `sudo mysql accumulated_knowledge < db/schema.sql` |
 | `lib/findings.ts` | the only place that reads or writes it |
 | `app/api/findings/…` | list / save / confirm / delete, all bearer-guarded |
 | `app/page.tsx` | the reading room — everything you know, on a big screen. Read-only on purpose: a finding edited from an armchair is a finding edited without being there. |
@@ -68,7 +68,7 @@ hours into the future. Every timestamp is passed explicitly, in UTC.
 ## Auth
 
 The service listens on `0.0.0.0` (WireGuard *and* the home LAN), so every route
-needs `Authorization: Bearer $LOCALKNOWLEDGE_API_TOKEN`. The server reads it from
+needs `Authorization: Bearer $ACCUMULATEDKNOWLEDGE_API_TOKEN`. The server reads it from
 `.env.local`; the APK gets the same value baked in at build time from the
 gitignored `mobile/.env`. A build with no token says so on screen.
 
@@ -79,14 +79,14 @@ is no public URL and no nginx in the path.
 
 ```bash
 cd mobile && ./gradlew assembleDevDebug      # always the dev flavour while developing
-androidDeploy localKnowledge                 # builds + CHUNKED install + launch
+androidDeploy accumulatedKnowledge                 # builds + CHUNKED install + launch
 ```
 
 Never `adb install -r` against a `:5555` serial — a raw install over WireGuard
 stalls permanently once the ADB buffer fills. `androidDeploy` routes through
 `utilities/chunked-adb-install.sh`, which is why it works.
 
-Web side: `d startApp --app localKnowledge` (dev 3153, prod 3152).
+Web side: `d startApp --app accumulatedKnowledge` (dev 3153, prod 3152).
 
 ## Tests
 

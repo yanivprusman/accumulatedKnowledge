@@ -3,7 +3,7 @@ import "./globals.css";
 import { FeedbackChat } from '@automate/feedback-lib/FeedbackChat';
 
 export const metadata: Metadata = {
-  title: "ידע מקומי",
+  title: "ידע מצטבר",
   description: "מה עובד, איפה — מה שלמדת בשטח ושום מפה לא יודעת",
 };
 

@@ -47,7 +47,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.automatelinux.localKnowledge.shared"
+    namespace = "com.automatelinux.accumulatedKnowledge.shared"
     compileSdk = 35
     defaultConfig {
         minSdk = 26

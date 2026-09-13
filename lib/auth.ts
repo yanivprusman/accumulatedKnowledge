@@ -11,8 +11,8 @@ import "server-only";
  * first looks like it is working.
  */
 export function authorize(request: Request): string | null {
-  const expected = process.env.LOCALKNOWLEDGE_API_TOKEN ?? "";
-  if (!expected) return "LOCALKNOWLEDGE_API_TOKEN is not set on the server";
+  const expected = process.env.ACCUMULATEDKNOWLEDGE_API_TOKEN ?? "";
+  if (!expected) return "ACCUMULATEDKNOWLEDGE_API_TOKEN is not set on the server";
 
   const header = request.headers.get("authorization") ?? "";
   const given = header.startsWith("Bearer ") ? header.slice(7) : "";

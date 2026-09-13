@@ -27,7 +27,7 @@ export default async function Home() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-10">
       <header className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">ידע מקומי</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">ידע מצטבר</h1>
         <p className="mt-2 text-[15px] leading-relaxed text-(--color-muted)">
           מה שלמדת בשטח ושום מפה לא יודעת. {findings.length} רישומים
           {needs.length > 0 && ` · ${needs.length} סוגי צורך`}.

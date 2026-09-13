@@ -21,6 +21,6 @@ dependencyResolutionManagement {
 
 includeBuild("build-logic")
 
-rootProject.name = "localKnowledge"
+rootProject.name = "accumulatedKnowledge"
 include(":shared")
 include(":app")

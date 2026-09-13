@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# localKnowledge
+# accumulatedKnowledge
 
 Read `README.md` first — it carries the model and the reasoning. The short version:
 
@@ -16,5 +16,5 @@ Read `README.md` first — it carries the model and the reasoning. The short ver
   screen in `mobile/app` is what stops iOS being a launcher away.
 - **The client owns the clock** — explicit UTC on every write, never
   `CURRENT_TIMESTAMP`.
-- Install with `androidDeploy localKnowledge`, never `adb install -r` over
+- Install with `androidDeploy accumulatedKnowledge`, never `adb install -r` over
   WireGuard.

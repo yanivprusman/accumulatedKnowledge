@@ -1,4 +1,4 @@
--- localKnowledge schema (system MySQL 3306, database `local_knowledge`).
+-- accumulatedKnowledge schema (system MySQL 3306, database `accumulated_knowledge`).
 --
 -- One table, because the app has exactly one kind of record: a FINDING.
 -- A finding is not a pin and not a review. It is "I wanted X; here is what
@@ -8,7 +8,7 @@
 -- gate locks at night and that you can park outside and walk 360 m. That
 -- sentence is the whole product, and it lives in `method`.
 --
--- Re-runnable: apply with `sudo mysql local_knowledge < db/schema.sql`.
+-- Re-runnable: apply with `sudo mysql accumulated_knowledge < db/schema.sql`.
 
 SET NAMES utf8mb4;
 
